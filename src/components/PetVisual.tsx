@@ -8,13 +8,13 @@ interface PetVisualProps {
   showTag?: boolean;
 }
 
-const gradients: Record<PetKind, string> = {
+const gradients: Partial<Record<PetKind, string>> = {
   dog: 'from-gold/35 via-cream-deep to-clay/20',
   cat: 'from-sky-deep via-cream-soft to-gold/25',
   bird: 'from-clay/25 via-cream-soft to-sky/60',
 };
 
-const strokes: Record<PetKind, string> = {
+const strokes: Partial<Record<PetKind, string>> = {
   dog: '#C88A22',
   cat: '#3A352F',
   bird: '#D9662F',

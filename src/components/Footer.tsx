@@ -128,11 +128,11 @@ export default function Footer() {
                 </span>
                 <div className="flex flex-col gap-1 mt-1.5">
                   {Array.isArray(footerContent.contact.phone) ? (
-                    footerContent.contact.phone.map((p, i) => (
+                    (footerContent.contact.phone as string[]).map((p, i) => (
                       <a key={i} href={`tel:${p.replace(/\s+/g, '')}`} className="text-sm text-charcoal/65 hover:text-[#ff7a00] transition-colors">{p}</a>
                     ))
                   ) : (
-                    <a href={`tel:${footerContent.contact.phone.replace(/\s+/g, '')}`} className="text-sm text-charcoal/65 hover:text-[#ff7a00] transition-colors">{footerContent.contact.phone}</a>
+                    <a href={`tel:${(footerContent.contact.phone as string).replace(/\s+/g, '')}`} className="text-sm text-charcoal/65 hover:text-[#ff7a00] transition-colors">{footerContent.contact.phone as string}</a>
                   )}
                 </div>
               </li>

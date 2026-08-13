@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { Search, ShoppingBag, User, LogOut, Menu, X, PawPrint } from 'lucide-react';
+import { Search, ShoppingBag, User, LogOut, Menu, X } from 'lucide-react';
 import { brand, nav } from '../data/content';
 
 export default function Header() {

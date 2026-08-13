@@ -89,7 +89,7 @@ export default function FeaturedProducts() {
           ref={gridRef}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          {filteredProducts.map((product, i) => (
+          {filteredProducts.map((product) => (
             <div
               key={`${product.id}-${activeFilter}`}
               className="stagger-item group relative flex flex-col rounded-2xl bg-white p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-card"
