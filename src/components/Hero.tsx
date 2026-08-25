@@ -11,6 +11,7 @@ export default function Hero() {
   const pet3Ref = useRef<HTMLImageElement>(null);
   const pet4Ref = useRef<HTMLImageElement>(null);
   const pet5Ref = useRef<HTMLImageElement>(null);
+  const pet6Ref = useRef<HTMLImageElement>(null);
   const heroContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -27,34 +28,40 @@ export default function Hero() {
     tl.set(document.body, { overflow: 'hidden' })
       .fromTo(
         pet1Ref.current,
-        { x: '-50vw', y: '20vh', rotation: -15, opacity: 0 },
-        { x: '15vw', y: '-5vh', rotation: 5, opacity: 1, duration: 2.5, ease: 'power2.out' }
+        { x: '-50vw', y: '-40vh', rotation: -15, opacity: 0 },
+        { x: '-20vw', y: '-20vh', rotation: 5, opacity: 1, duration: 2.5, ease: 'power2.out' }
       )
       .fromTo(
         pet2Ref.current,
-        { x: '50vw', y: '-20vh', rotation: 15, opacity: 0 },
-        { x: '-15vw', y: '10vh', rotation: -5, opacity: 1, duration: 2.5, ease: 'power2.out' },
+        { x: '50vw', y: '-40vh', rotation: 15, opacity: 0 },
+        { x: '20vw', y: '-15vh', rotation: -5, opacity: 1, duration: 2.5, ease: 'power2.out' },
         '<0.2'
       )
       .fromTo(
         pet3Ref.current,
-        { x: '-30vw', y: '-40vh', rotation: -25, opacity: 0 },
-        { x: '-25vw', y: '-15vh', rotation: 10, opacity: 1, duration: 2.5, ease: 'power2.out' },
+        { x: '-50vw', y: '40vh', rotation: -25, opacity: 0 },
+        { x: '-15vw', y: '20vh', rotation: 10, opacity: 1, duration: 2.5, ease: 'power2.out' },
         '<0.2'
       )
       .fromTo(
         pet4Ref.current,
-        { x: '30vw', y: '40vh', rotation: 25, opacity: 0 },
-        { x: '25vw', y: '20vh', rotation: -10, opacity: 1, duration: 2.5, ease: 'power2.out' },
+        { x: '50vw', y: '40vh', rotation: 25, opacity: 0 },
+        { x: '25vw', y: '15vh', rotation: -10, opacity: 1, duration: 2.5, ease: 'power2.out' },
         '<0.2'
       )
       .fromTo(
         pet5Ref.current,
-        { x: '0vw', y: '50vh', rotation: 0, opacity: 0 },
-        { x: '5vw', y: '25vh', rotation: 15, opacity: 1, duration: 2.5, ease: 'power2.out' },
+        { x: '-20vw', y: '0vh', rotation: 0, opacity: 0 },
+        { x: '-5vw', y: '5vh', rotation: 15, opacity: 1, duration: 2.5, ease: 'power2.out' },
         '<0.2'
       )
-      .to([pet1Ref.current, pet2Ref.current, pet3Ref.current, pet4Ref.current, pet5Ref.current], {
+      .fromTo(
+        pet6Ref.current,
+        { x: '20vw', y: '0vh', rotation: -10, opacity: 0 },
+        { x: '10vw', y: '-5vh', rotation: -15, opacity: 1, duration: 2.5, ease: 'power2.out' },
+        '<0.2'
+      )
+      .to([pet1Ref.current, pet2Ref.current, pet3Ref.current, pet4Ref.current, pet5Ref.current, pet6Ref.current], {
         y: '-100vh',
         opacity: 0,
         duration: 1.5,
@@ -120,6 +127,12 @@ export default function Hero() {
           alt="Pigeon"
           className="absolute w-32 h-32 md:w-52 md:h-52 object-cover rounded-full shadow-2xl border-4 border-white"
         />
+        <img
+          ref={pet6Ref}
+          src="https://cdn.corenexis.com/f/s2Z2Rkrt3CJ.jpg"
+          alt="Reptile"
+          className="absolute w-24 h-24 md:w-44 md:h-44 object-cover rounded-full shadow-2xl border-4 border-white"
+        />
       </div>
 
       {/* Background Video */}
@@ -148,8 +161,9 @@ export default function Hero() {
           {heroContent.description}
         </p>
         <div className="mt-8 flex items-center justify-center gap-3 flex-wrap">
-          <a href="#categories" className="btn-primary bg-clay text-white hover:bg-clay/90 border-transparent">
-            {heroContent.primaryButton} <ArrowRight size={16} />
+          <a href="/shop" className="btn-primary group">
+            {heroContent.primaryButton}
+            <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
           </a>
         </div>
       </div>

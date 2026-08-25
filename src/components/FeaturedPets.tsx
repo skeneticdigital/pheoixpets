@@ -1,10 +1,11 @@
 import { Plus } from 'lucide-react';
-import { products } from '../data/content';
 import PetVisual from './PetVisual';
 import useReveal from '../hooks/useReveal';
+import { useProducts } from '../context/ProductContext';
 
 export default function FeaturedPets() {
   const gridRef = useReveal<HTMLDivElement>({ type: 'fade-up', stagger: 0.1 });
+  const { products } = useProducts();
 
   return (
     <section id="products" className="container-shell py-24 md:py-32">
@@ -15,7 +16,7 @@ export default function FeaturedPets() {
             A few favorites.
           </h2>
         </div>
-        <a href="#products" className="btn-secondary">
+        <a href="/shop" className="btn-secondary">
           View All Products
         </a>
       </div>

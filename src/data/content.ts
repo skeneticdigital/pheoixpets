@@ -2,17 +2,17 @@
 
 export const brand = {
   name: 'Phoenix Pets',
-  tagline: 'Premium Pet Co.',
+  logo: '/phoenix_pets_logo.jpg',
 };
 
 export const nav = [
-  { label: 'Home', href: '#home' },
-  { label: 'About', href: '#about' },
-  { label: 'Contact', href: '#footer' },
-  { label: 'Cart', href: '#cart' },
+  { label: 'Home', href: '/' },
+  { label: 'Shop', href: '/shop' },
+  { label: 'About Us', href: '/about' },
+  { label: 'Contact Us', href: '/contact' },
 ];
 
-export type PetKind = 'bird' | 'dog' | 'cat' | 'pigeon' | 'hamster' | 'rabbit' | 'guinea_pig' | 'turtle' | 'reptile' | 'rooster' | 'mammal' | 'fish';
+export type PetKind = 'bird' | 'dog' | 'cat' | 'pigeon' | 'hamster' | 'rabbit' | 'guinea_pig' | 'turtle' | 'reptile' | 'rooster' | 'mammal';
 
 export interface PetAsset {
   id: string;
@@ -32,7 +32,7 @@ export const heroSlides: PetAsset[] = [
 ];
 
 export const heroContent = {
-  eyebrow: 'Furrow Pet Co.',
+  eyebrow: 'Phoenix Pets',
   title: 'Everything Your Pet Needs',
   description:
     'Discover premium care, products and essentials for the pets who mean everything to you. We do not sell pets, just the best supplies for them.',
@@ -61,14 +61,15 @@ export interface Category {
 
 export const categories: Category[] = [
   {
-    id: 'fish',
-    kind: 'fish',
-    title: 'Fish',
-    description: 'Aquariums, premium fish food, filters and water care essentials.',
-    button: 'Explore Fish Supplies',
+    id: 'reptiles',
+    kind: 'reptile',
+    title: 'Reptiles',
+    description: 'Specialized habitats, heating, and nutrition for your scaled companions.',
+    button: 'Explore Reptiles',
     breeds: [],
-    productsCount: 156,
+    productsCount: 56,
   },
+
   {
     id: 'bird',
     kind: 'bird',
@@ -118,7 +119,7 @@ export const categories: Category[] = [
     id: 'rabbit',
     kind: 'rabbit',
     title: 'Rabbit',
-    description: 'High-fiber diets and accessories for happy bunnies.',
+    description: 'High-fiber diets and supplies for happy bunnies.',
     button: 'Explore Rabbit',
     breeds: [],
     productsCount: 67,
@@ -140,15 +141,6 @@ export const categories: Category[] = [
     button: 'Explore Turtle',
     breeds: [],
     productsCount: 19,
-  },
-  {
-    id: 'reptiles',
-    kind: 'reptile',
-    title: 'Reptiles',
-    description: 'Specialized habitats, heating, and nutrition for your scaled companions.',
-    button: 'Explore Reptiles',
-    breeds: [],
-    productsCount: 56,
   },
   {
     id: 'fighting_rooster',
@@ -190,8 +182,8 @@ export const services = [
     icon: 'Stethoscope',
   },
   {
-    id: 'accessories',
-    title: 'Pet Accessories',
+    id: 'essentials',
+    title: 'Pet Essentials',
     description: 'Thoughtfully designed collars, beds and toys that are built to last.',
     icon: 'ShoppingBag',
   },
@@ -202,17 +194,18 @@ export interface Product {
   name: string;
   category: string;
   price: string;
+  originalPrice?: string;
+  discount?: string;
   kind: PetKind;
   image?: string;
+  imageName?: string;
 }
 
 export const products: Product[] = [
-  { id: 'p1', name: 'Slow-Grain Dog Food', category: 'Pet Food', price: '₹1400', kind: 'dog', image: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&q=80&w=600' },
-  { id: 'p2', name: 'Feather Wand Toy', category: 'Toys', price: '₹350', kind: 'cat', image: 'https://images.unsplash.com/photo-1545529468-42764ef8c85f?auto=format&fit=crop&q=80&w=600' },
-  { id: 'p3', name: 'Orthopedic Cloud Bed', category: 'Beds', price: '₹2999', kind: 'dog', image: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&q=80&w=600' },
-  { id: 'p4', name: 'Woven Perch Swing', category: 'Accessories', price: '₹600', kind: 'bird', image: 'https://images.unsplash.com/photo-1555685812-4b943f1cb0eb?auto=format&fit=crop&q=80&w=600' },
-  { id: 'p5', name: 'Premium Flakes', category: 'Pet Food', price: '₹450', kind: 'fish', image: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&q=80&w=600' },
-  { id: 'p6', name: 'Aquarium Filter Pro', category: 'Accessories', price: '₹1800', kind: 'fish', image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=600' },
+  { id: 'p1', name: 'Slow-Grain Dog Food', category: 'Dog', price: '₹1400', kind: 'dog', image: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&q=80&w=600' },
+  { id: 'p2', name: 'Feather Wand Toy', category: 'Cat', price: '₹350', kind: 'cat', image: 'https://images.unsplash.com/photo-1545529468-42764ef8c85f?auto=format&fit=crop&q=80&w=600' },
+  { id: 'p3', name: 'Orthopedic Cloud Bed', category: 'Dog', price: '₹2999', kind: 'dog', image: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&q=80&w=600' },
+  { id: 'p4', name: 'Woven Perch Swing', category: 'Bird', price: '₹600', kind: 'bird', image: 'https://images.unsplash.com/photo-1555685812-4b943f1cb0eb?auto=format&fit=crop&q=80&w=600' },
 ];
 
 export const testimonials = [
@@ -235,7 +228,7 @@ export const testimonials = [
     name: 'Meera V.',
     pet: 'Kiwi \u2014 Cockatiel',
     quote:
-      'Hard to find quality bird accessories locally. Furrow\u2019s aviary range is thoughtfully made.',
+      'Hard to find quality bird supplies locally. Furrow\u2019s aviary range is thoughtfully made.',
   },
   {
     id: 't4',
@@ -254,22 +247,32 @@ export const ctaContent = {
 
 export const footerContent = {
   description:
-    'Explore the world of premium pet care. From expert services to carefully selected food, accessories and toys, everything your pet needs in one place.',
+    'Explore the world of premium pet care. From expert services to carefully selected food, essentials and toys, everything your pet needs in one place.',
   quickLinks: [
-    'Home',
-    'About Us',
-    'Contact Us',
-    'Cart',
+    { label: 'Home', href: '/' },
+    { label: 'About Us', href: '/about' },
+    { label: 'Contact Us', href: '/contact' },
+    { label: 'Shop', href: '/shop' },
   ],
-  categoryLinks: ['Dogs', 'Cats', 'Birds', 'Fish', 'Small Pets', 'Reptiles', 'Accessories'],
+  categoryLinks: [
+    { label: 'Reptiles', href: '/shop' },
+    { label: 'Dog', href: '/shop' },
+    { label: 'Cat', href: '/shop' },
+    { label: 'Bird', href: '/shop' },
+    { label: 'Mammal', href: '/shop' }
+  ],
   contact: {
-    phone: ['+91 8797979300', '+91 63833 65871'],
+    phone: ['+91 8797979300'],
     email: 'hello@phoenixpets.in',
     address: 'No.35/15, S Mada St, Sarojini Nagar, Kolathur, Chennai, Greater Chennai, Tamil Nadu 600099',
   },
   bottom: {
     copyright: '\u00A9 2026 Phoenix Pets. All Rights Reserved.',
-    links: ['Privacy Policy', 'Terms of Service', 'Cookies Policy'],
+    links: [
+      { label: 'Privacy Policy', href: '/privacy-policy' },
+      { label: 'Terms of Service', href: '/terms-of-service' },
+      { label: 'Cookies Policy', href: '/cookies-policy' }
+    ],
     credit: 'Crafted by Skenetic Digital',
   },
 };

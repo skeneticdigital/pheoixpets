@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { PawPrint, Phone, Mail, MapPin } from 'lucide-react';
 import { brand, footerContent } from '../data/content';
 
@@ -63,18 +64,26 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center mb-6">
-              <img src="/phoenix_pets_logo.jpg" alt={brand.name} className="h-20 w-auto object-contain rounded-xl mix-blend-multiply" />
+              <div className="flex items-center justify-center bg-black rounded-full p-2 w-20 h-20 shadow-sm border border-charcoal/5">
+                <img src="/phoenix_pets_logo.png" alt={brand.name} className="h-full w-auto object-contain" />
+              </div>
             </div>
             <p className="text-sm text-charcoal/65 leading-relaxed max-w-xs">
               {footerContent.description}
             </p>
             <div className="flex items-center gap-3 mt-6">
-              {[FacebookGlyph, InstagramGlyph, YoutubeGlyph].map((Glyph, i) => (
+              {[
+                { icon: FacebookGlyph, url: 'https://www.facebook.com/61590696755055/' },
+                { icon: InstagramGlyph, url: 'https://www.instagram.com/phoenixpets.in?utm_source=qr' },
+                { icon: YoutubeGlyph, url: 'https://www.youtube.com/@PhoenixPets.in-1104' },
+              ].map(({ icon: Glyph, url }, i) => (
                 <a
                   key={i}
-                  href="#"
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label="Social link"
-                  className="h-10 w-10 flex items-center justify-center rounded-full bg-white text-charcoal hover:bg-charcoal hover:text-cream transition-colors duration-300"
+                  className="h-10 w-10 flex items-center justify-center rounded-full bg-white text-charcoal hover:bg-charcoal hover:text-cream transition-colors duration-300 shadow-sm border border-charcoal/5"
                 >
                   <Glyph />
                 </a>
@@ -87,14 +96,14 @@ export default function Footer() {
             <h4 className="font-display text-lg mb-5">Quick Links</h4>
             <ul className="space-y-3">
               {footerContent.quickLinks.map((link) => (
-                <li key={link}>
-                  <a
-                    href="#"
+                <li key={link.label}>
+                  <Link
+                    to={link.href}
                     className="group flex items-center gap-2 text-sm text-charcoal/65 hover:text-charcoal transition-colors duration-300"
                   >
                     <PawPrint size={12} className="text-clay shrink-0" />
-                    {link}
-                  </a>
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -105,14 +114,14 @@ export default function Footer() {
             <h4 className="font-display text-lg mb-5">Categories</h4>
             <ul className="space-y-3">
               {footerContent.categoryLinks.map((link) => (
-                <li key={link}>
-                  <a
-                    href="#"
+                <li key={link.label}>
+                  <Link
+                    to={link.href}
                     className="group flex items-center gap-2 text-sm text-charcoal/65 hover:text-charcoal transition-colors duration-300"
                   >
                     <PawPrint size={12} className="text-clay shrink-0" />
-                    {link}
-                  </a>
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -129,10 +138,10 @@ export default function Footer() {
                 <div className="flex flex-col gap-1 mt-1.5">
                   {Array.isArray(footerContent.contact.phone) ? (
                     (footerContent.contact.phone as string[]).map((p, i) => (
-                      <a key={i} href={`tel:${p.replace(/\s+/g, '')}`} className="text-sm text-charcoal/65 hover:text-[#ff7a00] transition-colors">{p}</a>
+                      <a key={i} href={`https://wa.me/${p.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-sm text-charcoal/65 hover:text-[#ff7a00] transition-colors">{p}</a>
                     ))
                   ) : (
-                    <a href={`tel:${(footerContent.contact.phone as string).replace(/\s+/g, '')}`} className="text-sm text-charcoal/65 hover:text-[#ff7a00] transition-colors">{footerContent.contact.phone as string}</a>
+                    <a href={`https://wa.me/${(footerContent.contact.phone as string).replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-sm text-charcoal/65 hover:text-[#ff7a00] transition-colors">{footerContent.contact.phone as string}</a>
                   )}
                 </div>
               </li>
@@ -157,15 +166,19 @@ export default function Footer() {
           <p>{footerContent.bottom.copyright}</p>
           <p className="flex items-center gap-3">
             {footerContent.bottom.links.map((link, i) => (
-              <span key={link} className="flex items-center gap-3">
-                <a href="#" className="hover:text-charcoal transition-colors">
-                  {link}
-                </a>
+              <span key={link.label} className="flex items-center gap-3">
+                <Link to={link.href} className="hover:text-charcoal transition-colors">
+                  {link.label}
+                </Link>
                 {i < footerContent.bottom.links.length - 1 && <span>|</span>}
               </span>
             ))}
           </p>
-          <p>{footerContent.bottom.credit}</p>
+          <p>
+            <a href="https://skeneticdigital.com/" target="_blank" rel="noopener noreferrer" className="hover:text-charcoal transition-colors">
+              {footerContent.bottom.credit}
+            </a>
+          </p>
         </div>
       </div>
     </footer>

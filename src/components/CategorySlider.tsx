@@ -19,7 +19,6 @@ const categoryImages = {
   reptile: 'https://images.unsplash.com/photo-1619816128374-a6b4766ca92c?auto=format&fit=crop&q=80&w=800',
   rooster: 'https://images.unsplash.com/photo-1588164950715-6aa49568dd80?auto=format&fit=crop&q=80&w=800',
   mammal: 'https://images.unsplash.com/photo-1519003017532-75fb8e1d4a2e?auto=format&fit=crop&q=80&w=800',
-  fish: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&q=80&w=800',
 };
 
 export default function CategorySlider() {
@@ -62,7 +61,7 @@ export default function CategorySlider() {
         >
           {categories.map((cat) => (
             <SwiperSlide key={cat.id} className="h-auto">
-              <a href={`#${cat.id}`} className="block h-full bg-white group hover:-translate-y-2 transition-transform duration-300">
+              <a href="/shop" className="block h-full bg-white group hover:-translate-y-2 transition-transform duration-300">
                 <div className="p-4 bg-gray-100/50">
                   <div className="w-full aspect-[3/4] overflow-hidden">
                     <img
