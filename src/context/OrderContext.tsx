@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import localforage from 'localforage';
 
 export interface OrderItem {
   id: string;
@@ -26,47 +25,32 @@ export interface Order {
 
 interface OrderContextType {
   orders: Order[];
-  addOrder: (customerDetails: CustomerDetails, items: OrderItem[], totalAmount: number) => void;
-  deleteOrder: (id: string) => void;
-  updateOrderStatus: (id: string, status: Order['status']) => void;
+  addOrder: (customerDetails: CustomerDetails, items: OrderItem[], totalAmount: number) => Promise<void>;
+  deleteOrder: (id: string) => Promise<void>;
+  updateOrderStatus: (id: string, status: Order['status']) => Promise<void>;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export function OrderProvider({ children }: { children: React.ReactNode }) {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    const initializeOrders = async () => {
+    const fetchOrders = async () => {
       try {
-        // Migration
-        const savedOrdersStr = localStorage.getItem('phoenix_pets_orders');
-        if (savedOrdersStr) {
-          await localforage.setItem('phoenix_pets_orders', JSON.parse(savedOrdersStr));
-          localStorage.removeItem('phoenix_pets_orders');
-        }
-
-        const savedOrders = await localforage.getItem<Order[]>('phoenix_pets_orders');
-        if (savedOrders) {
-          setOrders(savedOrders);
+        const res = await fetch('/api/orders');
+        if (res.ok) {
+          const apiOrders = await res.json();
+          setOrders(apiOrders);
         }
       } catch (err) {
-        console.error('Failed to init orders from localforage', err);
-      } finally {
-        setIsInitialized(true);
+        console.error('Failed to fetch orders from API', err);
       }
     };
-    initializeOrders();
+    fetchOrders();
   }, []);
 
-  useEffect(() => {
-    if (isInitialized) {
-      localforage.setItem('phoenix_pets_orders', orders).catch(console.error);
-    }
-  }, [orders, isInitialized]);
-
-  const addOrder = (customerDetails: CustomerDetails, items: OrderItem[], totalAmount: number) => {
+  const addOrder = async (customerDetails: CustomerDetails, items: OrderItem[], totalAmount: number) => {
     // Find the highest existing order number, ignoring old 6-digit random IDs
     const maxId = orders.reduce((max, order) => {
       const numMatch = order.id.match(/\d+/);
@@ -84,15 +68,45 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       totalAmount,
       status: 'Pending'
     };
-    setOrders((prev) => [newOrder, ...prev]);
+
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrder)
+      });
+      if (res.ok) {
+        setOrders((prev) => [newOrder, ...prev]);
+      }
+    } catch (e) {
+      console.error('Failed to place order in API', e);
+    }
   };
 
-  const deleteOrder = (id: string) => {
-    setOrders((prev) => prev.filter((o) => o.id !== id));
+  const deleteOrder = async (id: string) => {
+    try {
+      const res = await fetch(`/api/orders/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setOrders((prev) => prev.filter((o) => o.id !== id));
+      }
+    } catch (e) {
+      console.error('Failed to delete order from API', e);
+    }
   };
 
-  const updateOrderStatus = (id: string, status: Order['status']) => {
-    setOrders((prev) => prev.map((o) => o.id === id ? { ...o, status } : o));
+  const updateOrderStatus = async (id: string, status: Order['status']) => {
+    try {
+      const res = await fetch(`/api/orders/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      if (res.ok) {
+        setOrders((prev) => prev.map((o) => o.id === id ? { ...o, status } : o));
+      }
+    } catch (e) {
+      console.error('Failed to update order status in API', e);
+    }
   };
 
   return (

@@ -12,10 +12,10 @@ export interface MediaItem {
 
 interface ProductContextType {
   products: Product[];
-  addProduct: (product: Omit<Product, 'id'>) => void;
-  addProducts: (newProducts: Omit<Product, 'id'>[]) => void;
-  updateProduct: (product: Product) => void;
-  deleteProduct: (id: string) => void;
+  addProduct: (product: Omit<Product, 'id'>) => Promise<void>;
+  addProducts: (newProducts: Omit<Product, 'id'>[]) => Promise<void>;
+  updateProduct: (product: Product) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
   categories: string[];
   addCategory: (category: string) => void;
   deleteCategory: (category: string) => void;
@@ -37,45 +37,24 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
     'Hamster', 'Rabbit', 'Guinea Pig', 'Turtle', 'Fighting Rooster', 'Mammal'
   ];
 
-  // Initialize from localforage, with fallback migration from localStorage
   useEffect(() => {
-    const initializeStorage = async () => {
+    const initializeData = async () => {
       try {
-        // 1. Migration from localStorage to localforage
-        const savedProductsStr = localStorage.getItem('phoenix_pets_products');
-        if (savedProductsStr) {
-          await localforage.setItem('phoenix_pets_products', JSON.parse(savedProductsStr));
-          localStorage.removeItem('phoenix_pets_products');
-        }
-        const savedCategoriesStr = localStorage.getItem('phoenix_pets_categories');
-        if (savedCategoriesStr) {
-          await localforage.setItem('phoenix_pets_categories', JSON.parse(savedCategoriesStr));
-          localStorage.removeItem('phoenix_pets_categories');
-        }
-        const savedMediaStr = localStorage.getItem('phoenix_pets_media');
-        if (savedMediaStr) {
-          await localforage.setItem('phoenix_pets_media', JSON.parse(savedMediaStr));
-          localStorage.removeItem('phoenix_pets_media');
-        }
-
-        // 2. Load from localforage
-        const savedProducts: Product[] | null = await localforage.getItem('phoenix_pets_products');
-        if (savedProducts) {
-          const uniqueProducts: Product[] = [];
-          const seenIds = new Set<string>();
-          savedProducts.forEach((p, idx) => {
-            let finalId = p.id;
-            if (!finalId || seenIds.has(finalId)) {
-              finalId = `p${Date.now()}_${idx}_${Math.random().toString(36).substring(2, 6)}`;
-            }
-            seenIds.add(finalId);
-            uniqueProducts.push({ ...p, id: finalId });
-          });
-          setProducts(uniqueProducts);
-        } else {
+        // Fetch products from API
+        try {
+          const res = await fetch('/api/products');
+          if (res.ok) {
+            const apiProducts = await res.json();
+            setProducts(apiProducts.length > 0 ? apiProducts : defaultProducts);
+          } else {
+            setProducts(defaultProducts);
+          }
+        } catch (e) {
+          console.error('Error fetching products from API:', e);
           setProducts(defaultProducts);
         }
 
+        // Initialize categories & media from localforage
         const savedCategories: string[] | null = await localforage.getItem('phoenix_pets_categories');
         if (savedCategories) {
           setCategories(savedCategories);
@@ -88,48 +67,89 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
           setMedia(savedMedia);
         }
       } catch (err) {
-        console.error('Error initializing data from localforage', err);
+        console.error('Error initializing data', err);
       } finally {
         setIsInitialized(true);
       }
     };
 
-    initializeStorage();
+    initializeData();
   }, []);
 
-  // Save to localforage whenever products, categories, or media change
+  // Save localforage specific data when changed
   useEffect(() => {
     if (isInitialized) {
-      localforage.setItem('phoenix_pets_products', products).catch(console.error);
       localforage.setItem('phoenix_pets_categories', categories).catch(console.error);
       localforage.setItem('phoenix_pets_media', media).catch(console.error);
     }
-  }, [products, categories, media, isInitialized]);
+  }, [categories, media, isInitialized]);
 
-  const addProduct = (product: Omit<Product, 'id'>) => {
+  const addProduct = async (product: Omit<Product, 'id'>) => {
     const newProduct: Product = {
       ...product,
       id: `p${Date.now()}_${Math.random().toString(36).substring(2, 6)}`
     };
-    setProducts((prev) => [...prev, newProduct]);
+    
+    try {
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newProduct)
+      });
+      if (res.ok) {
+        setProducts((prev) => [newProduct, ...prev]);
+      }
+    } catch (e) {
+      console.error('Failed to add product to API', e);
+    }
   };
 
-  const addProducts = (newProducts: Omit<Product, 'id'>[]) => {
+  const addProducts = async (newProducts: Omit<Product, 'id'>[]) => {
     const productsWithIds = newProducts.map((p, index) => ({
       ...p,
       id: `p${Date.now()}_${index}_${Math.random().toString(36).substring(2, 6)}`
     }));
-    setProducts((prev) => [...prev, ...productsWithIds]);
+    
+    try {
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productsWithIds)
+      });
+      if (res.ok) {
+        setProducts((prev) => [...productsWithIds, ...prev]);
+      }
+    } catch (e) {
+      console.error('Failed to bulk add products to API', e);
+    }
   };
 
-  const updateProduct = (updatedProduct: Product) => {
-    setProducts((prev) => 
-      prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
-    );
+  const updateProduct = async (updatedProduct: Product) => {
+    try {
+      const res = await fetch(`/api/products/${updatedProduct.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedProduct)
+      });
+      if (res.ok) {
+        setProducts((prev) => 
+          prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
+        );
+      }
+    } catch (e) {
+      console.error('Failed to update product in API', e);
+    }
   };
 
-  const deleteProduct = (id: string) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
+  const deleteProduct = async (id: string) => {
+    try {
+      const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setProducts((prev) => prev.filter((p) => p.id !== id));
+      }
+    } catch (e) {
+      console.error('Failed to delete product from API', e);
+    }
   };
 
   const addCategory = (category: string) => {
