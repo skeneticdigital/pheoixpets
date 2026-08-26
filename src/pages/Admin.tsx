@@ -477,6 +477,30 @@ export default function Admin() {
                 Bulk Add Products
               </button>
               <button
+                onClick={async () => {
+                  try {
+                    // eslint-disable-next-line @typescript-eslint/no-var-requires
+                    const localforage = (await import('localforage')).default;
+                    const savedProducts: Product[] | null = await localforage.getItem('phoenix_pets_products');
+                    if (savedProducts && savedProducts.length > 0) {
+                      if (window.confirm(`Found ${savedProducts.length} local products. Do you want to recover and save them to the cloud database?`)) {
+                        await addProducts(savedProducts);
+                        alert('Recovery complete! Products have been uploaded to the cloud.');
+                      }
+                    } else {
+                      alert('No locally saved products found to recover.');
+                    }
+                  } catch (e) {
+                    console.error('Recovery failed', e);
+                    alert('Failed to recover products.');
+                  }
+                }}
+                className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none sm:w-auto"
+              >
+                <Download className="-ml-1 mr-2 h-5 w-5 text-gray-400" aria-hidden="true" />
+                Recover Local Products
+              </button>
+              <button
                 onClick={() => openProductModal()}
                 className="inline-flex items-center justify-center rounded-md border border-transparent bg-[#ff7a00] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#ff7a00]/90 focus:outline-none sm:w-auto"
               >
