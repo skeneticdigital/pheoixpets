@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { useProducts } from '../context/ProductContext';
 import { useCart } from '../context/CartContext';
@@ -18,7 +19,28 @@ export default function Shop() {
     return ['Reptiles', ...others];
   }, [dynamicCategories]);
 
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const initialCategory = searchParams.get('category');
+
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    initialCategory ? [initialCategory] : []
+  );
+  
+  useEffect(() => {
+    const queryCat = new URLSearchParams(location.search).get('category');
+    if (queryCat) {
+      // Find matching category (case-insensitive)
+      const matched = dynamicCategories.find(c => c.toLowerCase() === queryCat.toLowerCase());
+      if (matched) {
+        setSelectedCategories([matched]);
+      } else {
+        // Fallback to exactly what was in the query if no match
+        setSelectedCategories([queryCat]);
+      }
+    }
+  }, [location.search, dynamicCategories]);
+
   const [sortOption, setSortOption] = useState<'featured' | 'price-asc' | 'price-desc'>('featured');
   const [isSortOpen, setIsSortOpen] = useState(false);
 

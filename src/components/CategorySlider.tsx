@@ -61,7 +61,7 @@ export default function CategorySlider() {
         >
           {categories.map((cat) => (
             <SwiperSlide key={cat.id} className="h-auto">
-              <a href="/shop" className="block h-full bg-white group hover:-translate-y-2 transition-transform duration-300">
+              <a href={`/shop?category=${encodeURIComponent(cat.title)}`} className="block h-full bg-white group hover:-translate-y-2 transition-transform duration-300">
                 <div className="p-4 bg-gray-100/50">
                   <div className="w-full aspect-[3/4] overflow-hidden">
                     <img

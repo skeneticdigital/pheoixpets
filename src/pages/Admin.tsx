@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useProducts } from '../context/ProductContext';
 import { useOrders } from '../context/OrderContext';
 import type { Product, PetKind } from '../data/content';
+import { compressImage } from '../utils/imageCompressor';
 import { Plus, X, Edit2, Trash2, Download, MinusCircle, FileDown, Copy, LogOut } from 'lucide-react';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
@@ -88,8 +89,9 @@ export default function Admin() {
       if (!mediaName) setMediaName(file.name);
       
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setMediaPreview(reader.result as string);
+      reader.onloadend = async () => {
+        const compressed = await compressImage(reader.result as string, 800, 0.7);
+        setMediaPreview(compressed);
       };
       reader.readAsDataURL(file);
     }
@@ -117,7 +119,8 @@ export default function Admin() {
         reader.readAsDataURL(file);
       });
       
-      addMedia({ name: file.name, url: result });
+      const compressed = await compressImage(result, 800, 0.7);
+      addMedia({ name: file.name, url: compressed });
     }
     
     e.target.value = '';
@@ -756,15 +759,16 @@ export default function Admin() {
                             const file = e.target.files?.[0];
                             if (file) {
                               const reader = new FileReader();
-                              reader.onloadend = () => {
+                              reader.onloadend = async () => {
                                 const dataUrl = reader.result as string;
-                                setImage(dataUrl);
+                                const compressed = await compressImage(dataUrl, 800, 0.7);
+                                setImage(compressed);
                                 setImageName(file.name);
                                 if (!name) {
                                   setName(file.name.replace(/\.[^/.]+$/, ""));
                                 }
                                 // Save to Media library automatically
-                                addMedia({ name: file.name, url: dataUrl });
+                                addMedia({ name: file.name, url: compressed });
                               };
                               reader.readAsDataURL(file);
                             }
@@ -1098,14 +1102,15 @@ export default function Admin() {
                                     const file = e.target.files?.[0];
                                     if (file) {
                                       const reader = new FileReader();
-                                      reader.onloadend = () => {
+                                      reader.onloadend = async () => {
                                         const dataUrl = reader.result as string;
-                                        handleBulkChange(index, 'image', dataUrl);
+                                        const compressed = await compressImage(dataUrl, 800, 0.7);
+                                        handleBulkChange(index, 'image', compressed);
                                         handleBulkChange(index, 'imageName', file.name);
                                         if (!product.name) {
                                           handleBulkChange(index, 'name', file.name.replace(/\.[^/.]+$/, ""));
                                         }
-                                        addMedia({ name: file.name, url: dataUrl });
+                                        addMedia({ name: file.name, url: compressed });
                                       };
                                       reader.readAsDataURL(file);
                                     }
