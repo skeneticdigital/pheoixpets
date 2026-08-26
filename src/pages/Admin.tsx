@@ -103,6 +103,26 @@ export default function Admin() {
     }
   };
 
+  const handleFolderUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!file.type.startsWith('image/')) continue;
+      
+      const reader = new FileReader();
+      const result = await new Promise<string>((resolve) => {
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      });
+      
+      addMedia({ name: file.name, url: result });
+    }
+    
+    e.target.value = '';
+  };
+
   const handleExportCSV = () => {
     // Generate CSV data: product name, category, image name, price, original price
     const headers = ['Product Name', 'Category', 'Image Name', 'Price', 'Original Price', 'Discount'];
@@ -845,14 +865,30 @@ export default function Admin() {
             </p>
             
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Select Image</label>
-                <input 
-                  type="file" 
-                  accept="image/*"
-                  onChange={handleMediaFileChange}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#ff7a00]/10 file:text-[#ff7a00] hover:file:bg-[#ff7a00]/20"
-                />
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Select Single Image</label>
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={handleMediaFileChange}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#ff7a00]/10 file:text-[#ff7a00] hover:file:bg-[#ff7a00]/20"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Upload Entire Folder</label>
+                  <input 
+                    type="file" 
+                    // @ts-ignore - webkitdirectory is non-standard but works in all modern browsers
+                    webkitdirectory="" 
+                    directory=""
+                    multiple
+                    accept="image/*"
+                    onChange={handleFolderUpload}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Select a folder to bulk-upload all images inside it directly to the library.</p>
+                </div>
               </div>
               
               {mediaPreview && (
