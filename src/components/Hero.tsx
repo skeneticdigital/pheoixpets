@@ -135,17 +135,13 @@ export default function Hero() {
         />
       </div>
 
-      {/* Background Video */}
+      {/* Background Image */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
+        <img
+          src="https://kommodo.ai/i/SyhGGrxDOL7QgEHBPrS8"
+          alt="Pets background"
           className="w-full h-full object-cover opacity-30"
-        >
-          <source src="https://videos.pexels.com/video-files/5252069/5252069-hd_1920_1080_30fps.mp4" type="video/mp4" />
-        </video>
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-cream/80 via-cream/60 to-cream" />
       </div>
 
