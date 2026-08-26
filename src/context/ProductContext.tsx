@@ -13,7 +13,7 @@ export interface MediaItem {
 interface ProductContextType {
   products: Product[];
   addProduct: (product: Omit<Product, 'id'>) => Promise<void>;
-  addProducts: (newProducts: Omit<Product, 'id'>[]) => Promise<void>;
+  addProducts: (newProducts: Omit<Product, 'id'>[]) => Promise<boolean | void>;
   updateProduct: (product: Product) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
   categories: string[];
@@ -118,9 +118,18 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
       });
       if (res.ok) {
         setProducts((prev) => [...productsWithIds, ...prev]);
+        alert("Products added successfully!");
+        return true;
+      } else {
+        const errText = await res.text();
+        console.error("Error from API:", errText);
+        alert(`Failed to add products. Server responded with: ${res.status} ${errText}`);
+        return false;
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error('Failed to bulk add products to API', e);
+      alert(`Network error while bulk adding products: ${e.message || String(e)}`);
+      return false;
     }
   };
 

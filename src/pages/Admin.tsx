@@ -235,7 +235,7 @@ export default function Admin() {
     });
   };
 
-  const handleBulkSubmit = (e: React.MouseEvent | React.FormEvent) => {
+  const handleBulkSubmit = async (e: React.MouseEvent | React.FormEvent) => {
     if (e && e.preventDefault) e.preventDefault();
     
     // Manual validation
@@ -276,17 +276,23 @@ export default function Admin() {
       });
       
       try {
+        let success = false;
         if (typeof addProducts === 'function') {
-          addProducts(productsWithKind);
+          success = await addProducts(productsWithKind) as boolean;
         } else {
-          productsWithKind.forEach(p => addProduct(p));
+          for (const p of productsWithKind) {
+            await addProduct(p);
+          }
+          success = true;
+        }
+        
+        if (success !== false) {
+          setIsBulkModalOpen(false);
+          setBulkList([{ name: '', category: '', price: '₹', originalPrice: '', discount: '', kind: 'dog' as PetKind, image: '', imageName: '' }]);
         }
       } catch (err) {
-        productsWithKind.forEach(p => addProduct(p));
+        alert("An error occurred while adding products.");
       }
-
-      setIsBulkModalOpen(false);
-      setBulkList([{ name: '', category: '', price: '₹', originalPrice: '', discount: '', kind: 'dog' as PetKind, image: '', imageName: '' }]);
     } else {
       alert("Please fill in the product details before submitting.");
     }
