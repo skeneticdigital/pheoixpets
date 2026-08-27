@@ -1,6 +1,5 @@
 import { premiumAboutContent } from '../../data/aboutContent';
 import useReveal from '../../hooks/useReveal';
-import { Quote } from 'lucide-react';
 
 export default function WhyWeStarted() {
   const imgRef = useReveal<HTMLDivElement>({ type: 'fade-right', duration: 1.2 });
