@@ -17,7 +17,6 @@ export default function WhyWeStarted() {
             </p>
             
             <div className="relative pl-10 border-l-2 border-clay py-4">
-              <Quote className="absolute top-2 left-2 text-clay/20 w-16 h-16 -z-10" />
               <p className="font-display text-3xl md:text-4xl text-charcoal leading-tight">
                 "{premiumAboutContent.whyWeStarted.quote}"
               </p>

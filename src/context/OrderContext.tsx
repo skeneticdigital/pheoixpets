@@ -21,11 +21,12 @@ export interface Order {
   items: OrderItem[];
   totalAmount: number;
   status: 'Pending' | 'Completed' | 'Cancelled';
+  paymentScreenshot?: string;
 }
 
 interface OrderContextType {
   orders: Order[];
-  addOrder: (customerDetails: CustomerDetails, items: OrderItem[], totalAmount: number) => Promise<void>;
+  addOrder: (customerDetails: CustomerDetails, items: OrderItem[], totalAmount: number, paymentScreenshot?: string) => Promise<Order | undefined>;
   deleteOrder: (id: string) => Promise<void>;
   updateOrderStatus: (id: string, status: Order['status']) => Promise<void>;
 }
@@ -50,7 +51,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     fetchOrders();
   }, []);
 
-  const addOrder = async (customerDetails: CustomerDetails, items: OrderItem[], totalAmount: number) => {
+  const addOrder = async (customerDetails: CustomerDetails, items: OrderItem[], totalAmount: number, paymentScreenshot?: string) => {
     // Find the highest existing order number, ignoring old 6-digit random IDs
     const maxId = orders.reduce((max, order) => {
       const numMatch = order.id.match(/\d+/);
@@ -66,7 +67,8 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       customerDetails,
       items,
       totalAmount,
-      status: 'Pending'
+      status: 'Pending',
+      paymentScreenshot
     };
 
     try {
@@ -77,6 +79,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       });
       if (res.ok) {
         setOrders((prev) => [newOrder, ...prev]);
+        return newOrder;
       }
     } catch (e) {
       console.error('Failed to place order in API', e);

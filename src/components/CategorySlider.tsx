@@ -75,9 +75,6 @@ export default function CategorySlider() {
                   <h3 className="font-sans font-bold text-lg text-zinc-900 uppercase tracking-widest mb-1">
                     {cat.title}
                   </h3>
-                  <p className="font-sans text-sm text-gray-500">
-                    {cat.productsCount} Products
-                  </p>
                 </div>
               </a>
             </SwiperSlide>

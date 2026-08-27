@@ -199,6 +199,7 @@ export interface Product {
   kind: PetKind;
   image?: string;
   imageName?: string;
+  stock?: number;
 }
 
 export const products: Product[] = [
@@ -255,11 +256,11 @@ export const footerContent = {
     { label: 'Shop', href: '/shop' },
   ],
   categoryLinks: [
-    { label: 'Reptiles', href: '/shop' },
-    { label: 'Dog', href: '/shop' },
-    { label: 'Cat', href: '/shop' },
-    { label: 'Bird', href: '/shop' },
-    { label: 'Mammal', href: '/shop' }
+    { label: 'Reptiles', href: '/shop?category=Reptiles' },
+    { label: 'Dog', href: '/shop?category=Dog' },
+    { label: 'Cat', href: '/shop?category=Cat' },
+    { label: 'Bird', href: '/shop?category=Bird' },
+    { label: 'Mammal', href: '/shop?category=Mammal' }
   ],
   contact: {
     phone: ['+91 8797979300'],

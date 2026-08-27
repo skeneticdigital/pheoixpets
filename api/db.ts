@@ -51,9 +51,28 @@ export async function initDb() {
         items JSON NOT NULL,
         totalAmount VARCHAR(50) NOT NULL,
         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        status VARCHAR(50) DEFAULT 'Pending'
+        status VARCHAR(50) DEFAULT 'Pending',
+        paymentScreenshot LONGTEXT
       )
     `);
+
+    // Add stock column if it doesn't exist
+    try {
+      await connection.query('ALTER TABLE products ADD COLUMN stock INT DEFAULT 0');
+    } catch (e: any) {
+      if (e.code !== 'ER_DUP_FIELDNAME') {
+        console.error('Error adding stock column:', e);
+      }
+    }
+
+    // Add paymentScreenshot column if it doesn't exist
+    try {
+      await connection.query('ALTER TABLE orders ADD COLUMN paymentScreenshot LONGTEXT');
+    } catch (e: any) {
+      if (e.code !== 'ER_DUP_FIELDNAME') {
+        console.error('Error adding paymentScreenshot column:', e);
+      }
+    }
 
     connection.release();
     console.log('TiDB database initialized successfully.');

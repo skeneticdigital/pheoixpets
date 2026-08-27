@@ -3,6 +3,8 @@ import { useOrders } from '../context/OrderContext';
 import { Link } from 'react-router-dom';
 import { Trash2, ShoppingBag, ArrowLeft, Plus, Minus, CheckCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import PaymentModal from '../components/PaymentModal';
+import InvoiceView from '../components/InvoiceView';
 
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
@@ -10,6 +12,11 @@ export default function Cart() {
   
   const [isCheckout, setIsCheckout] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  
+  const [showPayment, setShowPayment] = useState(false);
+  const [completedOrder, setCompletedOrder] = useState<any>(null);
+  const [termsAgreed, setTermsAgreed] = useState(false);
+  const adminUpiId = localStorage.getItem('admin_upi_id');
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -25,17 +32,64 @@ export default function Cart() {
     return sum + (numericPrice * item.quantity);
   }, 0);
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    addOrder(
+    if (!termsAgreed) return;
+    if (adminUpiId) {
+      setShowPayment(true);
+    } else {
+      await processOrder();
+    }
+  };
+
+  const processOrder = async (screenshot?: string) => {
+    const newOrder = await addOrder(
       { name, email, phone, address },
       cart.map(c => ({ id: c.id, name: c.name, price: c.price, quantity: c.quantity })),
-      total
+      total,
+      screenshot
     );
     clearCart();
     setIsCheckout(false);
-    setIsSuccess(true);
+    setTermsAgreed(false);
+    
+    if (newOrder) {
+      setCompletedOrder(newOrder);
+    } else {
+      setIsSuccess(true);
+    }
   };
+
+  const handlePaymentConfirm = (screenshot: string) => {
+    setShowPayment(false);
+    processOrder(screenshot);
+  };
+
+  if (completedOrder) {
+    return (
+      <div className="min-h-screen pt-32 pb-16 bg-[#f8eedf] flex flex-col items-center justify-center">
+        <h2 className="text-3xl font-display text-charcoal mb-4">Order Placed Successfully!</h2>
+        <p className="text-charcoal/60 mb-8">Please download or print your invoice below.</p>
+        <button 
+          onClick={() => {
+            setCompletedOrder(null);
+            setIsSuccess(true);
+          }} 
+          className="btn-primary bg-[#ff7a00] text-white mb-8"
+        >
+          Continue Shopping
+        </button>
+        <InvoiceView 
+          order={completedOrder} 
+          onClose={() => {
+             setCompletedOrder(null);
+             setIsSuccess(true);
+          }} 
+          showPaidStamp={true} 
+        />
+      </div>
+    );
+  }
 
   if (isSuccess) {
     return (
@@ -145,7 +199,31 @@ export default function Cart() {
                   <input type="email" required placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#ff7a00]" />
                   <input type="tel" required placeholder="Phone Number" value={phone} onChange={e => setPhone(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#ff7a00]" />
                   <textarea required placeholder="Delivery Address" value={address} onChange={e => setAddress(e.target.value)} rows={3} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#ff7a00]"></textarea>
-                  <button type="submit" className="w-full btn-primary bg-[#ff7a00] text-white mt-2">
+                  
+                  <div className="flex items-start mt-4 mb-2">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="cart-terms"
+                        name="cart-terms"
+                        type="checkbox"
+                        required
+                        checked={termsAgreed}
+                        onChange={(e) => setTermsAgreed(e.target.checked)}
+                        className="focus:ring-[#ff7a00] h-4 w-4 text-[#ff7a00] border-gray-300 rounded"
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label htmlFor="cart-terms" className="font-medium text-gray-700">
+                        I agree to terms & conditions
+                      </label>
+                    </div>
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    disabled={!termsAgreed}
+                    className="w-full btn-primary bg-[#ff7a00] text-white mt-2 disabled:opacity-50"
+                  >
                     Place Order (₹{total.toLocaleString('en-IN')})
                   </button>
                 </form>
@@ -154,6 +232,15 @@ export default function Cart() {
           </div>
         )}
       </div>
+
+      {showPayment && adminUpiId && (
+        <PaymentModal
+          amount={total}
+          upiId={adminUpiId}
+          onConfirm={handlePaymentConfirm}
+          onCancel={() => setShowPayment(false)}
+        />
+      )}
     </div>
   );
 }

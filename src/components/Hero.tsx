@@ -136,33 +136,38 @@ export default function Hero() {
       </div>
 
       {/* Background Image */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
+      <div className="absolute inset-0 -z-10 overflow-hidden bg-black">
         <img
           src="https://cdn.corenexis.com/f/Vfq4PupHfWN.jpeg"
           alt="Pets background"
-          className="w-full h-full object-cover opacity-80"
+          className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-cream/50 via-cream/20 to-cream" />
+        <div className="absolute inset-0 bg-black/20" /> {/* Slight dark overlay to make white text pop */}
       </div>
 
-      <div
-        ref={heroContentRef}
-        className="container-shell text-center mb-10 md:mb-16 opacity-0 relative z-10 w-full"
-      >
-        <span className="eyebrow inline-block text-clay">{heroContent.eyebrow}</span>
-        <h1 className="mt-4 font-display text-[2.5rem] leading-[1.05] md:text-6xl lg:text-[4.2rem] max-w-4xl mx-auto text-charcoal">
-          {heroContent.title}
-        </h1>
-        <p className="mt-5 text-base md:text-lg text-charcoal/65 max-w-xl mx-auto">
-          {heroContent.description}
-        </p>
-        <div className="mt-8 flex items-center justify-center gap-3 flex-wrap">
-          <a href="/shop" className="btn-primary group">
-            {heroContent.primaryButton}
-            <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-          </a>
+      <div className="container-shell h-full flex flex-col justify-center items-center relative z-10 px-6 sm:px-10 lg:px-12 mt-12">
+        <div ref={heroContentRef} className="max-w-4xl flex flex-col items-center text-center">
+          <p className="text-white font-medium tracking-[0.2em] uppercase text-sm mb-4 drop-shadow-md">
+            {heroContent.eyebrow}
+          </p>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-display text-white mb-6 drop-shadow-lg leading-tight whitespace-nowrap">
+            {heroContent.title}
+          </h1>
+          <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl font-medium drop-shadow-md">
+            {heroContent.description}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <a
+              href="/shop"
+              className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-transparent border-2 border-white rounded-full hover:bg-white/10 transition-colors shadow-lg"
+            >
+              Shop Now
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </a>
+          </div>
         </div>
       </div>
+
     </section>
   );
 }

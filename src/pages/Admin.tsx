@@ -3,9 +3,10 @@ import { useProducts } from '../context/ProductContext';
 import { useOrders } from '../context/OrderContext';
 import type { Product, PetKind } from '../data/content';
 import { compressImage } from '../utils/imageCompressor';
-import { Plus, X, Edit2, Trash2, Download, MinusCircle, FileDown, Copy, LogOut } from 'lucide-react';
+import { Plus, X, Edit2, Trash2, Download, MinusCircle, FileDown, Copy, LogOut, Settings } from 'lucide-react';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
+import InvoiceView from '../components/InvoiceView';
 
 export default function Admin() {
   const { products, addProduct, addProducts, updateProduct, deleteProduct, categories: dynamicCategories, addCategory, deleteCategory, media, addMedia, deleteMedia } = useProducts();
@@ -34,7 +35,7 @@ export default function Admin() {
     localStorage.removeItem('adminAuth');
   };
 
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'media'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'media' | 'settings'>('products');
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isCategoryDiscountModalOpen, setIsCategoryDiscountModalOpen] = useState(false);
@@ -42,12 +43,21 @@ export default function Admin() {
 
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
 
+  const [adminUpiId, setAdminUpiId] = useState(() => localStorage.getItem('admin_upi_id') || '');
+
+  const handleSaveUpiId = (e: React.FormEvent) => {
+    e.preventDefault();
+    localStorage.setItem('admin_upi_id', adminUpiId);
+    alert('UPI ID saved successfully!');
+  };
+
   // Single Product Form state
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
   const [originalPrice, setOriginalPrice] = useState('');
   const [discount, setDiscount] = useState('');
+  const [stock, setStock] = useState<number>(0);
   const [kind, setKind] = useState<PetKind>('dog');
   const [image, setImage] = useState('');
   const [newCategoryName, setNewCategoryName] = useState('');
@@ -59,7 +69,7 @@ export default function Admin() {
 
   // Dynamic Bulk Upload state
   const [bulkList, setBulkList] = useState([
-    { name: '', category: '', price: '₹', originalPrice: '', discount: '', kind: 'dog' as PetKind, image: '', imageName: '' }
+    { name: '', category: '', price: '₹', originalPrice: '', discount: '', stock: 0, kind: 'dog' as PetKind, image: '', imageName: '' }
   ]);
 
   // Category Discount state
@@ -127,23 +137,7 @@ export default function Admin() {
     // Generate CSV data: product name, category, image name, price, original price
     const headers = ['Product Name', 'Category', 'Image Name', 'Price', 'Original Price', 'Discount'];
     const rows = products.map(p => {
-      // Extract image name from URL or use provided imageName
-      let imgName = p.imageName || '';
-      if (!imgName && p.image && !p.image.startsWith('data:')) {
-        const parts = p.image.split('/');
-        imgName = parts[parts.length - 1] || '';
-        // Remove query parameters if any
-        if (imgName.includes('?')) {
-          imgName = imgName.split('?')[0];
-        }
-      } else if (!imgName && p.image && p.image.startsWith('data:')) {
-         imgName = p.name; // Use product name if it's a local upload
-      }
-
-      // If imgName is still 'Local Upload' or empty, use the product name
-      if (!imgName || imgName === 'Local Upload') {
-        imgName = p.name;
-      }
+      let imgName = p.name;
 
       return [
         `"${p.name.replace(/"/g, '""')}"`, // escape quotes
@@ -177,6 +171,7 @@ export default function Admin() {
       setPrice(product.price);
       setOriginalPrice(product.originalPrice || '');
       setDiscount(product.discount || '');
+      setStock(product.stock ?? 0);
       setKind(product.kind);
       setImage(product.image || '');
       setImageName(product.imageName || '');
@@ -187,6 +182,7 @@ export default function Admin() {
       setPrice('₹');
       setOriginalPrice('');
       setDiscount('');
+      setStock(0);
       setKind('dog');
       setImage('');
       setImageName('');
@@ -203,15 +199,20 @@ export default function Admin() {
     e.preventDefault();
     
     if (editingProduct) {
-      updateProduct({ ...editingProduct, name, category, price, originalPrice, discount, kind, image, imageName });
+      updateProduct({ ...editingProduct, name, category, price, originalPrice, discount, stock, kind, image, imageName });
     } else {
-      addProduct({ name, category, price, originalPrice, discount, kind, image, imageName });
+      addProduct({ name, category, price, originalPrice, discount, stock, kind, image, imageName });
     }
+    
+    if (stock === 1) {
+      window.open(`https://wa.me/9187979300?text=Alert:%20Product%20${encodeURIComponent(name)}%20is%20low%20on%20stock%20(1%20left)!`, '_blank');
+    }
+    
     closeProductModal();
   };
 
   const handleAddBulkRow = () => {
-    setBulkList([...bulkList, { name: '', category: '', price: '₹', originalPrice: '', discount: '', kind: 'dog' as PetKind, image: '', imageName: '' }]);
+    setBulkList([...bulkList, { name: '', category: '', price: '₹', originalPrice: '', discount: '', stock: 0, kind: 'dog' as PetKind, image: '', imageName: '' }]);
   };
 
   const handleRemoveBulkRow = (index: number) => {
@@ -293,7 +294,13 @@ export default function Admin() {
         
         if (success !== false) {
           setIsBulkModalOpen(false);
-          setBulkList([{ name: '', category: '', price: '₹', originalPrice: '', discount: '', kind: 'dog' as PetKind, image: '', imageName: '' }]);
+          setBulkList([{ name: '', category: '', price: '₹', originalPrice: '', discount: '', stock: 0, kind: 'dog' as PetKind, image: '', imageName: '' }]);
+          
+          const lowStockProducts = productsWithKind.filter(p => p.stock === 1);
+          if (lowStockProducts.length > 0) {
+            const names = lowStockProducts.map(p => p.name).join(', ');
+            window.open(`https://wa.me/9187979300?text=Alert:%20Low%20stock%20(1%20left)%20for:%20${encodeURIComponent(names)}`, '_blank');
+          }
         }
       } catch (err) {
         alert("An error occurred while adding products.");
@@ -349,29 +356,7 @@ export default function Admin() {
     setSelectedOrder(order);
   };
 
-  const handlePrint = async () => {
-    const element = document.getElementById('invoice-content');
-    if (!element) return;
-    
-    // Hide buttons during PDF generation
-    const buttons = document.querySelectorAll('.print-hide');
-    buttons.forEach(b => ((b as HTMLElement).style.display = 'none'));
-    
-    const opt = {
-      margin:       0,
-      filename:     `PhoenixPets_Invoice_${selectedOrder?.id}.pdf`,
-      image:        { type: 'jpeg' as const, quality: 0.98 },
-      html2canvas:  { scale: 2 },
-      jsPDF:        { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
-    };
 
-    try {
-      await html2pdf().set(opt).from(element).save();
-    } finally {
-      // Restore buttons
-      buttons.forEach(b => ((b as HTMLElement).style.display = ''));
-    }
-  };
 
   if (!isAuthenticated) {
     return (
@@ -469,6 +454,18 @@ export default function Admin() {
             >
               Media
             </button>
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`${
+                activeTab === 'settings'
+                  ? 'bg-[#ff7a00] text-white'
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              } px-4 py-4 text-left font-medium transition-colors border-b border-gray-400`}
+            >
+              <div className="flex items-center">
+                <Settings size={18} className="mr-2" /> Settings
+              </div>
+            </button>
             <div className="pt-4 mt-4">
               <button
                 onClick={handleLogout}
@@ -526,6 +523,7 @@ export default function Admin() {
                           <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Product</th>
                           <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Category</th>
                           <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Price</th>
+                          <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Stock</th>
                           <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                             <span className="sr-only">Actions</span>
                           </th>
@@ -549,6 +547,9 @@ export default function Admin() {
                             </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                               {product.price}
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                              {product.stock ?? 0}
                             </td>
                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                               <button onClick={() => openProductModal(product)} className="text-[#ff7a00] hover:text-[#e06a00] mr-4">
@@ -667,7 +668,7 @@ export default function Admin() {
                         </select>
                       </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-4 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Sale Price</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
@@ -699,6 +700,16 @@ export default function Admin() {
                           }}
                           className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#ff7a00] focus:border-[#ff7a00] sm:text-sm" 
                           placeholder="29% OFF" 
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Stock</label>
+                        <input 
+                          type="number" 
+                          value={stock} 
+                          onChange={e => setStock(parseInt(e.target.value) || 0)} 
+                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#ff7a00] focus:border-[#ff7a00] sm:text-sm" 
+                          placeholder="0" 
                         />
                       </div>
                     </div>
@@ -1067,6 +1078,15 @@ export default function Admin() {
                             className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm focus:outline-none focus:border-[#ff7a00]" 
                           />
                         </div>
+                        <div className="w-full sm:w-20">
+                          <input 
+                            type="number" 
+                            placeholder="Stock" 
+                            value={product.stock} 
+                            onChange={e => handleBulkChange(index, 'stock', e.target.value)} 
+                            className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm focus:outline-none focus:border-[#ff7a00]" 
+                          />
+                        </div>
                         <div className="w-full sm:w-1/3 flex items-center gap-2">
                           <div className="flex-1 space-y-1">
                             <select
@@ -1156,131 +1176,45 @@ export default function Admin() {
         </div>
       )}
 
-      {/* Invoice Modal / Printable Area */}
-      {selectedOrder && (
-        <div className="fixed inset-0 z-[200] overflow-y-auto" role="dialog" aria-modal="true">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity print-hide" onClick={() => setSelectedOrder(null)}></div>
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen print-hide">&#8203;</span>
-            <div className="inline-block align-bottom sm:align-middle relative">
-              <div className="print-hide flex justify-end space-x-2 mb-4 w-full">
-                <button onClick={handlePrint} className="bg-[#ff7a00] text-white rounded px-3 py-1.5 text-xs font-medium hover:bg-[#ff7a00]/90 focus:outline-none inline-flex items-center shadow-sm transition-colors">
-                  <Download className="h-3.5 w-3.5 mr-1.5" /> Download Invoice
-                </button>
-                <button onClick={() => setSelectedOrder(null)} className="bg-white rounded-md px-3 py-1.5 text-gray-700 font-medium border border-gray-300 hover:bg-gray-50 focus:outline-none shadow-sm text-xs">
-                  Close
-                </button>
+      {activeTab === 'settings' && (
+        <div className="flex-1">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-display text-charcoal">Settings</h2>
+          </div>
+          
+          <div className="bg-white rounded-2xl shadow-card p-6">
+            <h3 className="text-xl font-display text-charcoal mb-4 border-b border-gray-100 pb-2">Payment Integration</h3>
+            <form onSubmit={handleSaveUpiId} className="max-w-md">
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Store UPI ID</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g., storename@upi" 
+                  value={adminUpiId}
+                  onChange={(e) => setAdminUpiId(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff7a00] focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">This UPI ID will be used to generate a payment QR code during checkout.</p>
               </div>
-              <div className="bg-white invoice-print mx-auto" style={{ width: '210mm', height: '297mm' }}>
-
-              {/* Invoice Content */}
-              <div 
-                id="invoice-content" 
-                className="p-12 bg-white w-full h-full flex flex-col text-left border-[16px] border-double border-gray-200"
+              <button 
+                type="submit" 
+                className="btn-primary bg-[#ff7a00] text-white"
               >
-                {/* Header Section */}
-                <div className="flex justify-between items-start mb-8 border-b-2 border-gray-100 pb-6">
-                  <div className="text-left flex-1">
-                    <h2 className="text-4xl font-display text-charcoal font-bold tracking-widest uppercase mb-2">INVOICE</h2>
-                    <p className="text-base font-bold text-gray-800 mt-2">Order #{selectedOrder.id}</p>
-                    <p className="text-sm font-semibold text-gray-500 mt-1">Date: {new Date(selectedOrder.date).toLocaleDateString()}</p>
-                  </div>
-                  <div className="flex-shrink-0 flex flex-col items-center justify-start mx-6">
-                    <div className="bg-black rounded-full h-24 w-24 flex items-center justify-center p-3 shadow-md border-2 border-[#ff7a00]/30">
-                      <img src="/phoenix_pets_logo.png" alt="Phoenix Pets Logo" className="w-full h-full object-contain" />
-                    </div>
-                  </div>
-                  <div className="text-right flex-1">
-                    <h3 className="font-bold text-xl text-charcoal mb-1 font-display">Phoenix Pets</h3>
-                    <p className="text-sm font-semibold text-gray-600 max-w-[220px] ml-auto leading-tight">No.35/15, S Mada St, Sarojini Nagar, Kolathur, Chennai, Greater Chennai, Tamil Nadu 600099</p>
-                    <p className="text-sm font-semibold text-gray-700 mt-1.5">+91 8797979300</p>
-                  </div>
-                </div>
-
-                <div className="mb-8 bg-gray-50/70 p-5 rounded-lg border border-gray-100">
-                  <div className="max-w-sm">
-                    <h4 className="text-xs font-bold text-gray-400 mb-1 font-display tracking-widest uppercase">BILL TO:</h4>
-                    <p className="font-bold text-gray-900 text-lg font-display">{selectedOrder.customerDetails.name}</p>
-                    <p className="font-semibold text-sm text-gray-700 mt-1">{selectedOrder.customerDetails.email}</p>
-                    <p className="font-semibold text-sm text-gray-700 mt-0.5">{selectedOrder.customerDetails.phone}</p>
-                    <p className="font-semibold text-sm text-gray-700 mt-1 whitespace-pre-wrap">{selectedOrder.customerDetails.address}</p>
-                  </div>
-                </div>
-
-                <table className="min-w-full mb-6 border-collapse border border-gray-200 rounded-lg overflow-hidden">
-                  <thead className="bg-gray-100/80">
-                    <tr>
-                      <th className="py-3 px-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200 w-16">S.No</th>
-                      <th className="py-3 px-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200">Item</th>
-                      <th className="py-3 px-4 text-center text-xs font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200 w-24">Qty</th>
-                      <th className="py-3 px-4 text-right text-xs font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200 w-32">Price</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {selectedOrder.items.map((item: any, idx: number) => (
-                      <tr key={item.id}>
-                        <td className="py-3.5 px-4 text-sm font-semibold text-gray-700 text-center">{idx + 1}</td>
-                        <td className="py-3.5 px-4 text-sm font-semibold text-gray-900">{item.name}</td>
-                        <td className="py-3.5 px-4 text-sm font-semibold text-gray-700 text-center">{item.quantity}</td>
-                        <td className="py-3.5 px-4 text-sm font-bold text-gray-900 text-right">{item.price}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="bg-gray-50 border-t-2 border-gray-200">
-                      <td colSpan={3} className="py-4 px-4 text-right font-bold text-gray-900 text-base">Total:</td>
-                      <td className="py-4 px-4 text-right font-bold text-2xl text-[#ff7a00]">₹{selectedOrder.totalAmount.toLocaleString('en-IN')}</td>
-                    </tr>
-                  </tfoot>
-                </table>
-
-                {/* Terms & Conditions Section */}
-                <div className="mt-4 pt-4 border-t border-gray-200 text-left">
-                  <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2 font-display">
-                    Terms & Conditions:
-                  </h4>
-                  <ol className="list-decimal list-inside text-xs text-gray-600 space-y-1 font-medium">
-                    <li>Goods once sold cannot be returned or exchanged without prior authorization & valid receipt.</li>
-                    <li>Live pets and perishable pet food items are non-refundable once delivered safely.</li>
-                    <li>For any claims, damage reports, or delivery inquiries, please contact Phoenix Pets within 24 hours.</li>
-                  </ol>
-                </div>
-
-                <div className="text-center mt-auto pt-6 border-t border-gray-200">
-                  <p className="font-bold text-gray-700 text-base font-display">Thank you for shopping with Phoenix Pets!</p>
-                </div>
-              </div>
-              </div>
-            </div>
+                Save Settings
+              </button>
+            </form>
           </div>
         </div>
       )}
+
+      {/* Invoice Modal / Printable Area */}
+      <InvoiceView 
+        order={selectedOrder} 
+        onClose={() => setSelectedOrder(null)} 
+        showPaidStamp={false} 
+      />
       
       </div> {/* End of Main Content Area */}
-
-      {/* Print styles injected directly to hide non-invoice elements during printing */}
-      <style>{`
-        @media print {
-          body * {
-            visibility: hidden;
-          }
-          .invoice-print, .invoice-print * {
-            visibility: visible;
-          }
-          .invoice-print {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            padding: 0;
-            margin: 0;
-            box-shadow: none;
-          }
-          .print-hide {
-            display: none !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }

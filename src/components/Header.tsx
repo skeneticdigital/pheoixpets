@@ -74,10 +74,10 @@ export default function Header() {
     >
       <div className="container-shell relative">
         <div
-          className={`flex items-center justify-between gap-4 rounded-pill border transition-all duration-500 ease-cinematic ${
+          className={`flex items-center justify-between gap-4 rounded-pill transition-all duration-500 ease-cinematic ${
             scrolled
-              ? 'bg-cream/80 backdrop-blur-md border-charcoal/10 shadow-soft px-4 py-2'
-              : 'bg-cream/40 backdrop-blur-sm border-transparent px-5 py-3'
+              ? 'bg-cream/90 backdrop-blur-md border border-charcoal/10 shadow-soft px-4 py-2'
+              : 'bg-transparent border-transparent px-5 py-3'
           }`}
         >
           {/* Logo */}

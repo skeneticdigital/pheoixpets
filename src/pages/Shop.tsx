@@ -6,6 +6,8 @@ import { useCart } from '../context/CartContext';
 import { useOrders } from '../context/OrderContext';
 import type { Product } from '../data/content';
 import { ShoppingBag, ChevronDown, X, Zap, Plus, Minus } from 'lucide-react';
+import PaymentModal from '../components/PaymentModal';
+import InvoiceView from '../components/InvoiceView';
 
 export default function Shop() {
   const { products, categories: dynamicCategories } = useProducts();
@@ -54,6 +56,11 @@ export default function Shop() {
     address: ''
   });
 
+  const [showPayment, setShowPayment] = useState(false);
+  const [completedOrder, setCompletedOrder] = useState<any>(null);
+  const [termsAgreed, setTermsAgreed] = useState(false);
+  const adminUpiId = localStorage.getItem('admin_upi_id');
+
   const toggleCategory = (cat: string) => {
     setSelectedCategories(prev => 
       prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
@@ -80,14 +87,24 @@ export default function Shop() {
     return result;
   }, [products, selectedCategories, sortOption]);
 
-  const handleOrderSubmit = (e: React.FormEvent) => {
+  const handleOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!orderingProduct || !termsAgreed) return;
+    
+    if (adminUpiId) {
+      setShowPayment(true);
+    } else {
+      await processOrder();
+    }
+  };
+
+  const processOrder = async (screenshot?: string) => {
     if (!orderingProduct) return;
     
     const singlePrice = parsePrice(orderingProduct.price);
     const totalPrice = singlePrice * orderQuantity;
     
-    addOrder(
+    const newOrder = await addOrder(
       customerInfo,
       [{
         id: orderingProduct.id,
@@ -95,12 +112,23 @@ export default function Shop() {
         price: orderingProduct.price,
         quantity: orderQuantity
       }],
-      totalPrice
+      totalPrice,
+      screenshot
     );
     
     setOrderingProduct(null);
     setOrderQuantity(1);
     setCustomerInfo({ name: '', email: '', phone: '', address: '' });
+    setTermsAgreed(false);
+    
+    if (newOrder) {
+      setCompletedOrder(newOrder);
+    }
+  };
+
+  const handlePaymentConfirm = (screenshot: string) => {
+    setShowPayment(false);
+    processOrder(screenshot);
   };
 
   return (
@@ -332,11 +360,35 @@ export default function Shop() {
                       <label className="block text-sm font-medium text-gray-700">Delivery Address</label>
                       <textarea required rows={3} value={customerInfo.address} onChange={e => setCustomerInfo({...customerInfo, address: e.target.value})} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#ff7a00] focus:border-[#ff7a00] sm:text-sm"></textarea>
                     </div>
+                    
+                    <div className="flex items-start mt-4 mb-4">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="terms"
+                          name="terms"
+                          type="checkbox"
+                          required
+                          checked={termsAgreed}
+                          onChange={(e) => setTermsAgreed(e.target.checked)}
+                          className="focus:ring-[#ff7a00] h-4 w-4 text-[#ff7a00] border-gray-300 rounded"
+                        />
+                      </div>
+                      <div className="ml-3 text-sm">
+                        <label htmlFor="terms" className="font-medium text-gray-700">
+                          I agree to terms & conditions
+                        </label>
+                      </div>
+                    </div>
+
                     <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-                      <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-[#ff7a00] text-base font-medium text-white hover:bg-[#ff7a00]/90 focus:outline-none sm:col-start-2 sm:text-sm">
+                      <button 
+                        type="submit" 
+                        disabled={!termsAgreed}
+                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-[#ff7a00] text-base font-medium text-white hover:bg-[#ff7a00]/90 focus:outline-none disabled:opacity-50 sm:col-start-2 sm:text-sm"
+                      >
                         Place Order
                       </button>
-                      <button type="button" onClick={() => setOrderingProduct(null)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:col-start-1 sm:text-sm">
+                      <button type="button" onClick={() => { setOrderingProduct(null); setTermsAgreed(false); }} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:col-start-1 sm:text-sm">
                         Cancel
                       </button>
                     </div>
@@ -364,6 +416,23 @@ export default function Shop() {
             </div>
           </div>
         </div>
+      )}
+
+      {showPayment && orderingProduct && adminUpiId && (
+        <PaymentModal
+          amount={parsePrice(orderingProduct.price) * orderQuantity}
+          upiId={adminUpiId}
+          onConfirm={handlePaymentConfirm}
+          onCancel={() => setShowPayment(false)}
+        />
+      )}
+
+      {completedOrder && (
+        <InvoiceView
+          order={completedOrder}
+          onClose={() => setCompletedOrder(null)}
+          showPaidStamp={true}
+        />
       )}
     </div>
   );
