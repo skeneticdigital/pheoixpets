@@ -75,10 +75,7 @@ export default function Admin() {
         // Assume discount is percentage
         const sale = orig - (orig * (disc / 100));
         setPrice('₹' + Math.round(sale).toString());
-        // Auto-format discount to "X% OFF" if it's just a number
-        if (/^\d+(\.\d+)?$/.test(discount.trim())) {
-          setDiscount(discount.trim() + '% OFF');
-        }
+        // Auto-formatting is now handled onBlur to prevent cursor jumping
       }
     }
   }, [originalPrice, discount]);
@@ -710,7 +707,18 @@ export default function Admin() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Discount</label>
-                        <input type="text" value={discount} onChange={e => setDiscount(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#ff7a00] focus:border-[#ff7a00] sm:text-sm" placeholder="29% OFF" />
+                        <input 
+                          type="text" 
+                          value={discount} 
+                          onChange={e => setDiscount(e.target.value)} 
+                          onBlur={() => {
+                            if (/^\d+(\.\d+)?$/.test(discount.trim())) {
+                              setDiscount(discount.trim() + '% OFF');
+                            }
+                          }}
+                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#ff7a00] focus:border-[#ff7a00] sm:text-sm" 
+                          placeholder="29% OFF" 
+                        />
                       </div>
                     </div>
                     <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-4">
@@ -1065,7 +1073,18 @@ export default function Admin() {
                           <input type="text" value={product.originalPrice.replace(/^₹/, '')} onChange={e => handleBulkChange(index, 'originalPrice', '₹' + e.target.value)} className="block w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-[#ff7a00]" placeholder="Orig Price" />
                         </div>
                         <div className="w-full sm:w-28">
-                          <input type="text" placeholder="Disc(10)" value={product.discount} onChange={e => handleBulkChange(index, 'discount', e.target.value)} className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm focus:outline-none focus:border-[#ff7a00]" />
+                          <input 
+                            type="text" 
+                            placeholder="Disc(10)" 
+                            value={product.discount} 
+                            onChange={e => handleBulkChange(index, 'discount', e.target.value)} 
+                            onBlur={() => {
+                              if (/^\d+(\.\d+)?$/.test(product.discount.trim())) {
+                                handleBulkChange(index, 'discount', product.discount.trim() + '% OFF');
+                              }
+                            }}
+                            className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm focus:outline-none focus:border-[#ff7a00]" 
+                          />
                         </div>
                         <div className="w-full sm:w-1/3 flex items-center gap-2">
                           <div className="flex-1 space-y-1">
