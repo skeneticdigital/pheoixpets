@@ -140,9 +140,9 @@ export default function Hero() {
         <img
           src="https://cdn.corenexis.com/f/Vfq4PupHfWN.jpeg"
           alt="Pets background"
-          className="w-full h-full object-cover opacity-30"
+          className="w-full h-full object-cover opacity-80"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-cream/80 via-cream/60 to-cream" />
+        <div className="absolute inset-0 bg-gradient-to-b from-cream/50 via-cream/20 to-cream" />
       </div>
 
       <div

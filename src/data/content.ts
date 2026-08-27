@@ -36,7 +36,7 @@ export const heroContent = {
   title: 'Everything Your Pet Needs',
   description:
     'Discover premium care, products and essentials for the pets who mean everything to you. We do not sell pets, just the best supplies for them.',
-  primaryButton: 'Shop Products',
+  primaryButton: 'Shop Now',
   secondaryButton: 'Learn More',
 };
 
