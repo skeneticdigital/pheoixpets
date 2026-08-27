@@ -150,7 +150,7 @@ export default function Hero() {
           <p className="text-white font-medium tracking-[0.2em] uppercase text-sm mb-4 drop-shadow-md">
             {heroContent.eyebrow}
           </p>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-display text-white mb-6 drop-shadow-lg leading-tight whitespace-nowrap">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-display text-white mb-6 drop-shadow-lg leading-tight">
             {heroContent.title}
           </h1>
           <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl font-medium drop-shadow-md">

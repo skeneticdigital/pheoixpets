@@ -212,11 +212,11 @@ export default function Shop() {
 
           {/* Grid */}
           {filteredAndSortedProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {filteredAndSortedProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="group relative flex flex-col rounded-2xl bg-white p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-card animate-[fadeIn_0.5s_ease]"
+                  className="group relative flex flex-col rounded-2xl bg-white p-3 sm:p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-card animate-[fadeIn_0.5s_ease]"
                 >
                   {product.image && (
                     <div className="mb-4 aspect-square w-full overflow-hidden rounded-xl bg-cream-soft relative">
@@ -228,11 +228,11 @@ export default function Shop() {
                   )}
                   
                   <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                    <span className="rounded-full bg-cream-soft px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-charcoal/60 shrink-0">
+                    <span className="rounded-full bg-cream-soft px-2 py-1 sm:px-3 sm:py-1 text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-charcoal/60 shrink-0">
                       {product.category}
                     </span>
-                    <div className="flex items-center flex-wrap gap-1.5">
-                      <span className="font-display font-medium text-[#1e3a8a] text-base">
+                    <div className="flex items-center flex-wrap gap-1 sm:gap-1.5">
+                      <span className="font-display font-medium text-[#1e3a8a] text-sm sm:text-base">
                         {product.price}
                       </span>
                       {product.originalPrice && (
@@ -248,29 +248,29 @@ export default function Shop() {
                     </div>
                   </div>
                   
-                  <div className="flex-1">
-                    <h3 className="font-display text-xl text-charcoal group-hover:text-charcoal transition-colors">
+                  <div className="flex-1 mt-1 sm:mt-0">
+                    <h3 className="font-display text-sm sm:text-xl text-charcoal group-hover:text-charcoal transition-colors leading-tight">
                       {product.name}
                     </h3>
                   </div>
                   
-                  <div className="mt-4 flex items-center justify-between border-t border-charcoal/5 pt-4">
-                    <span className="text-sm font-medium capitalize text-charcoal/50">
+                  <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center justify-between border-t border-charcoal/5 pt-3 sm:pt-4 gap-2 sm:gap-0">
+                    <span className="text-xs sm:text-sm font-medium capitalize text-charcoal/50">
                       {product.kind}
                     </span>
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-1.5 sm:space-x-2">
                       <button 
                         onClick={() => { setOrderingProduct(product); setOrderQuantity(1); }}
-                        className="flex h-10 px-4 items-center justify-center rounded-full bg-[#ff7a00] text-white font-medium text-sm transition-colors hover:bg-[#ff7a00]/90 shadow-sm"
+                        className="flex flex-1 sm:flex-none h-8 px-2 sm:h-10 sm:px-4 items-center justify-center rounded-full bg-[#ff7a00] text-white font-medium text-xs sm:text-sm transition-colors hover:bg-[#ff7a00]/90 shadow-sm"
                       >
-                        <Zap size={16} className="mr-1" /> Order
+                        <Zap size={14} className="mr-1 sm:w-4 sm:h-4" /> <span className="hidden sm:inline">Order</span><span className="sm:hidden">Buy</span>
                       </button>
                       <button 
                         onClick={() => addToCart(product)}
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-cream-soft text-charcoal transition-colors hover:bg-gray-200"
+                        className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-cream-soft text-charcoal transition-colors hover:bg-gray-200 shrink-0"
                         title="Add to Cart"
                       >
-                        <ShoppingBag size={18} />
+                        <ShoppingBag size={16} className="sm:w-[18px] sm:h-[18px]" />
                       </button>
                     </div>
                   </div>
