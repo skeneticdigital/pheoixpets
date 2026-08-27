@@ -138,7 +138,7 @@ export default function Hero() {
       {/* Background Image */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <img
-          src="https://kommodo.ai/i/SyhGGrxDOL7QgEHBPrS8"
+          src="https://cdn.corenexis.com/f/Vfq4PupHfWN.jpeg"
           alt="Pets background"
           className="w-full h-full object-cover opacity-30"
         />
