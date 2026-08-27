@@ -137,7 +137,12 @@ export default function Admin() {
           imgName = imgName.split('?')[0];
         }
       } else if (!imgName && p.image && p.image.startsWith('data:')) {
-         imgName = 'Local Upload';
+         imgName = p.name; // Use product name if it's a local upload
+      }
+
+      // If imgName is still 'Local Upload' or empty, use the product name
+      if (!imgName || imgName === 'Local Upload') {
+        imgName = p.name;
       }
 
       return [
@@ -152,8 +157,8 @@ export default function Admin() {
     
     const csvContent = [headers, ...rows].map(e => e.join(',')).join('\n');
     
-    // Create a Blob and trigger download
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    // Create a Blob with UTF-8 BOM and trigger download so Excel reads symbols correctly
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
@@ -501,30 +506,6 @@ export default function Admin() {
               >
                 <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
                 Bulk Add Products
-              </button>
-              <button
-                onClick={async () => {
-                  try {
-                    // eslint-disable-next-line @typescript-eslint/no-var-requires
-                    const localforage = (await import('localforage')).default;
-                    const savedProducts: Product[] | null = await localforage.getItem('phoenix_pets_products');
-                    if (savedProducts && savedProducts.length > 0) {
-                      if (window.confirm(`Found ${savedProducts.length} local products. Do you want to recover and save them to the cloud database?`)) {
-                        await addProducts(savedProducts);
-                        alert('Recovery complete! Products have been uploaded to the cloud.');
-                      }
-                    } else {
-                      alert('No locally saved products found to recover.');
-                    }
-                  } catch (e) {
-                    console.error('Recovery failed', e);
-                    alert('Failed to recover products.');
-                  }
-                }}
-                className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none sm:w-auto"
-              >
-                <Download className="-ml-1 mr-2 h-5 w-5 text-gray-400" aria-hidden="true" />
-                Recover Local Products
               </button>
               <button
                 onClick={() => openProductModal()}
