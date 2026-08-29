@@ -99,9 +99,6 @@ export default function ContactUs() {
                       <a href="https://wa.me/918797979300" target="_blank" rel="noopener noreferrer" className="text-charcoal/70 hover:text-clay transition-colors text-sm block">
                         +91 8797979300
                       </a>
-                      <a href="tel:+916383365871" className="text-charcoal/70 hover:text-clay transition-colors text-sm block mt-0.5">
-                        +91 63833 65871
-                      </a>
                     </div>
                   </div>
 
