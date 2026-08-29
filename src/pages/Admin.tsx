@@ -205,7 +205,7 @@ export default function Admin() {
     }
     
     if (stock === 1) {
-      window.open(`https://wa.me/9187979300?text=Alert:%20Product%20${encodeURIComponent(name)}%20is%20low%20on%20stock%20(1%20left)!`, '_blank');
+      window.open(`https://wa.me/918797979300?text=Alert:%20Product%20${encodeURIComponent(name)}%20is%20low%20on%20stock%20(1%20left)!`, '_blank');
     }
     
     closeProductModal();
@@ -299,7 +299,7 @@ export default function Admin() {
           const lowStockProducts = productsWithKind.filter(p => p.stock === 1);
           if (lowStockProducts.length > 0) {
             const names = lowStockProducts.map(p => p.name).join(', ');
-            window.open(`https://wa.me/9187979300?text=Alert:%20Low%20stock%20(1%20left)%20for:%20${encodeURIComponent(names)}`, '_blank');
+            window.open(`https://wa.me/918797979300?text=Alert:%20Low%20stock%20(1%20left)%20for:%20${encodeURIComponent(names)}`, '_blank');
           }
         }
       } catch (err) {

@@ -84,7 +84,7 @@ export default function Footer() {
                 { icon: FacebookGlyph, url: 'https://www.facebook.com/61590696755055/' },
                 { icon: InstagramGlyph, url: 'https://www.instagram.com/phoenixpets.in?utm_source=qr' },
                 { icon: YoutubeGlyph, url: 'https://www.youtube.com/@PhoenixPets.in-1104' },
-                { icon: WhatsappGlyph, url: 'https://wa.me/9187979300' },
+                { icon: WhatsappGlyph, url: 'https://wa.me/918797979300' },
               ].map(({ icon: Glyph, url }, i) => (
                 <a
                   key={i}
