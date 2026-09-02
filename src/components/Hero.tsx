@@ -147,7 +147,7 @@ export default function Hero() {
 
       <div className="container-shell h-full flex flex-col justify-center items-center relative z-10 px-6 sm:px-10 lg:px-12 mt-12">
         <div ref={heroContentRef} className="max-w-4xl flex flex-col items-center text-center">
-          <p className="text-[#ff7a00] font-bold tracking-[0.3em] uppercase text-sm md:text-base mb-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] bg-transparent px-8 py-3 rounded-full border border-white/50 inline-block">
+          <p className="text-[#ff7a00] font-bold tracking-[0.3em] uppercase text-sm md:text-base mb-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] bg-black/20 px-8 py-3 rounded-full border border-white/30 inline-block">
             {heroContent.eyebrow}
           </p>
           <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-display text-white mb-6 drop-shadow-lg leading-tight">
