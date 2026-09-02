@@ -27,10 +27,13 @@ export default function Cart() {
     window.scrollTo(0, 0);
   }, []);
 
-  const total = cart.reduce((sum, item) => {
+  const subtotal = cart.reduce((sum, item) => {
     const numericPrice = Number(item.price.replace(/[^0-9.-]+/g, ""));
     return sum + (numericPrice * item.quantity);
   }, 0);
+
+  const shipping = 100;
+  const total = subtotal > 0 ? subtotal + shipping : 0;
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -176,11 +179,11 @@ export default function Cart() {
               <div className="space-y-4 text-charcoal/80 mb-8">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="font-medium text-charcoal">₹{total.toLocaleString('en-IN')}</span>
+                  <span className="font-medium text-charcoal">₹{subtotal.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span className="text-green-600 font-medium">Free</span>
+                  <span className="font-medium text-charcoal">₹{shipping}</span>
                 </div>
                 <div className="border-t border-charcoal/10 pt-4 flex justify-between font-display text-xl text-charcoal">
                   <span>Total</span>

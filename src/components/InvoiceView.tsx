@@ -113,6 +113,14 @@ export default function InvoiceView({ order, onClose, showPaidStamp = false }: I
                   ))}
                 </tbody>
                 <tfoot>
+                  <tr className="bg-white border-t border-gray-200">
+                    <td colSpan={3} className="py-3 px-4 text-right font-bold text-gray-700 text-sm">Subtotal:</td>
+                    <td className="py-3 px-4 text-right font-bold text-gray-900 text-sm">₹{(order.totalAmount > 100 ? order.totalAmount - 100 : order.totalAmount).toLocaleString('en-IN')}</td>
+                  </tr>
+                  <tr className="bg-white">
+                    <td colSpan={3} className="py-3 px-4 text-right font-bold text-gray-700 text-sm">Shipping:</td>
+                    <td className="py-3 px-4 text-right font-bold text-gray-900 text-sm">₹100</td>
+                  </tr>
                   <tr className="bg-gray-50 border-t-2 border-gray-200">
                     <td colSpan={3} className="py-4 px-4 text-right font-bold text-gray-900 text-base">Total:</td>
                     <td className="py-4 px-4 text-right font-bold text-2xl text-[#ff7a00]">₹{order.totalAmount.toLocaleString('en-IN')}</td>
