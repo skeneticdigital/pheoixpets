@@ -44,11 +44,13 @@ export default function Admin() {
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
 
   const [adminUpiId, setAdminUpiId] = useState(() => localStorage.getItem('admin_upi_id') || '');
+  const [adminShippingCharge, setAdminShippingCharge] = useState(() => localStorage.getItem('admin_shipping_charge') || '100');
 
-  const handleSaveUpiId = (e: React.FormEvent) => {
+  const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
     localStorage.setItem('admin_upi_id', adminUpiId);
-    alert('UPI ID saved successfully!');
+    localStorage.setItem('admin_shipping_charge', adminShippingCharge);
+    alert('Settings saved successfully!');
   };
 
   // Single Product Form state
@@ -1183,8 +1185,8 @@ export default function Admin() {
           </div>
           
           <div className="bg-white rounded-2xl shadow-card p-6">
-            <h3 className="text-xl font-display text-charcoal mb-4 border-b border-gray-100 pb-2">Payment Integration</h3>
-            <form onSubmit={handleSaveUpiId} className="max-w-md">
+            <h3 className="text-xl font-display text-charcoal mb-4 border-b border-gray-100 pb-2">Store Settings</h3>
+            <form onSubmit={handleSaveSettings} className="max-w-md">
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Store UPI ID</label>
                 <input 
@@ -1195,6 +1197,19 @@ export default function Admin() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff7a00] focus:border-transparent"
                 />
                 <p className="text-xs text-gray-500 mt-1">This UPI ID will be used to generate a payment QR code during checkout.</p>
+              </div>
+              
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Shipping Charge (₹)</label>
+                <input 
+                  type="number" 
+                  placeholder="e.g., 100" 
+                  value={adminShippingCharge}
+                  onChange={(e) => setAdminShippingCharge(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff7a00] focus:border-transparent"
+                  min="0"
+                />
+                <p className="text-xs text-gray-500 mt-1">This flat rate will be added to the customer's total during checkout.</p>
               </div>
               <button 
                 type="submit" 

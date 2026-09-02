@@ -32,7 +32,8 @@ export default function Cart() {
     return sum + (numericPrice * item.quantity);
   }, 0);
 
-  const shipping = 100;
+  const storedShipping = localStorage.getItem('admin_shipping_charge');
+  const shipping = storedShipping !== null ? Number(storedShipping) : 100;
   const total = subtotal > 0 ? subtotal + shipping : 0;
 
   const handlePlaceOrder = async (e: React.FormEvent) => {

@@ -38,6 +38,16 @@ function createInvoicePDF(order: any): Promise<Buffer> {
     });
     
     doc.moveDown(2);
+    
+    const subtotal = order.items.reduce((sum: number, item: any) => {
+      const numericPrice = Number(String(item.price).replace(/[^0-9.-]+/g, ""));
+      return sum + (numericPrice * item.quantity);
+    }, 0);
+    const shippingCharge = order.totalAmount > subtotal ? order.totalAmount - subtotal : 0;
+
+    doc.fontSize(14).text(`Subtotal: Rs. ${subtotal.toLocaleString('en-IN')}`, { align: 'right' });
+    doc.fontSize(14).text(`Shipping: Rs. ${shippingCharge}`, { align: 'right' });
+    doc.moveDown(0.5);
     doc.fontSize(16).fillColor('#ff7a00').text(`Total Amount: Rs. ${order.totalAmount.toLocaleString('en-IN')}`, { align: 'right' });
 
     doc.end();
@@ -223,7 +233,11 @@ app.post('/api/orders', async (req, res) => {
               </tbody>
             </table>
             
-            <h3 style="text-align: right; margin-top: 20px;">Total: ₹${o.totalAmount.toLocaleString('en-IN')}</h3>
+            <div style="text-align: right; margin-top: 20px;">
+              <p style="margin: 5px 0;"><strong>Subtotal:</strong> ₹${o.items.reduce((s: number, i: any) => s + (Number(String(i.price).replace(/[^0-9.-]+/g, "")) * i.quantity), 0).toLocaleString('en-IN')}</p>
+              <p style="margin: 5px 0;"><strong>Shipping:</strong> ₹${(o.totalAmount - o.items.reduce((s: number, i: any) => s + (Number(String(i.price).replace(/[^0-9.-]+/g, "")) * i.quantity), 0)).toLocaleString('en-IN')}</p>
+              <h3 style="color: #ff7a00; margin-top: 10px;">Total: ₹${o.totalAmount.toLocaleString('en-IN')}</h3>
+            </div>
             <p style="color: #666; font-size: 14px; margin-top: 30px;">If you have any questions, please reply to this email.</p>
           </div>
         `,

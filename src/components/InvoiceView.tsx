@@ -10,6 +10,12 @@ interface InvoiceViewProps {
 export default function InvoiceView({ order, onClose, showPaidStamp = false }: InvoiceViewProps) {
   if (!order) return null;
 
+  const subtotal = order.items.reduce((sum: number, item: any) => {
+    const numericPrice = Number(String(item.price).replace(/[^0-9.-]+/g, ""));
+    return sum + (numericPrice * item.quantity);
+  }, 0);
+  const shippingCharge = order.totalAmount > subtotal ? order.totalAmount - subtotal : 0;
+
   const handlePrint = async () => {
     const element = document.getElementById('invoice-content');
     if (!element) return;
@@ -115,11 +121,11 @@ export default function InvoiceView({ order, onClose, showPaidStamp = false }: I
                 <tfoot>
                   <tr className="bg-white border-t border-gray-200">
                     <td colSpan={3} className="py-3 px-4 text-right font-bold text-gray-700 text-sm">Subtotal:</td>
-                    <td className="py-3 px-4 text-right font-bold text-gray-900 text-sm">₹{(order.totalAmount > 100 ? order.totalAmount - 100 : order.totalAmount).toLocaleString('en-IN')}</td>
+                    <td className="py-3 px-4 text-right font-bold text-gray-900 text-sm">₹{subtotal.toLocaleString('en-IN')}</td>
                   </tr>
                   <tr className="bg-white">
                     <td colSpan={3} className="py-3 px-4 text-right font-bold text-gray-700 text-sm">Shipping:</td>
-                    <td className="py-3 px-4 text-right font-bold text-gray-900 text-sm">₹100</td>
+                    <td className="py-3 px-4 text-right font-bold text-gray-900 text-sm">₹{shippingCharge}</td>
                   </tr>
                   <tr className="bg-gray-50 border-t-2 border-gray-200">
                     <td colSpan={3} className="py-4 px-4 text-right font-bold text-gray-900 text-base">Total:</td>
