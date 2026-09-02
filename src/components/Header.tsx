@@ -82,7 +82,7 @@ export default function Header() {
         >
           {/* Logo */}
           <div ref={logoRef} className="flex items-center shrink-0">
-            <Link to="/" className="flex items-center justify-center bg-black rounded-full p-1.5 w-12 h-12 shadow-sm border border-charcoal/5">
+            <Link to="/" className="flex items-center justify-center bg-black rounded-full p-2 w-16 h-16 md:w-20 md:h-20 shadow-sm border border-charcoal/5">
               <img src="/phoenix_pets_logo.png" alt={brand.name} className="h-full w-auto object-contain" />
             </Link>
           </div>
